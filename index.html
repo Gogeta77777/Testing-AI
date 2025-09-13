@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Application</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --danger: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9fafb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #e0e7ff 0%, #d1fae5 100%);
+            border-radius: 0 0 1rem 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: var(--dark);
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+        }
+        
+        .chat-container {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 1.5rem;
+            height: 600px;
+        }
+        
+        .users-list {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        .users-list h3 {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.3s;
+        }
+        
+        .user-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+        }
+        
+        .message.incoming {
+            align-self: flex-start;
+            background-color: #e5e7eb;
+        }
+        
+        .message.outgoing {
+            align-self: flex-end;
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+            gap: 0.5rem;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .auth-forms {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+            margin-left: auto;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-forms {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">AI Chat</div>
+                <div class="nav-links">
+                    <a href="#" id="home-link">Home</a>
+                    <a href="#" id="chat-link">Chat</a>
+                    <a href="#" id="login-link">Login</a>
+                    <a href="#" id="register-link">Register</a>
+                    <a href="#" id="logout-link" style="display: none;">Logout</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="home-page" class="page active">
+            <div class="hero">
+                <h1>AI-Powered Multiplayer Chat</h1>
+                <p>Experience the next generation of chat applications with AI integration, real-time multiplayer features, and secure user authentication.</p>
+                <button class="btn btn-primary" id="get-started-btn">Get Started</button>
+            </div>
+            
+            <div class="card">
+                <h2>Features</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+                    <div>
+                        <h3>🤖 AI Integration</h3>
+                        <p>Chat with our advanced AI that learns from your conversations and provides intelligent responses.</p>
+                    </div>
+                    <div>
+                        <h3>👥 Multiplayer</h3>
+                        <p>Connect with friends and other users in real-time chat rooms with typing indicators.</p>
+                    </div>
+                    <div>
+                        <h3>🔐 Secure Authentication</h3>
+                        <p>Your data is securely stored and protected with our advanced authentication system.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="auth-page" class="page">
+            <h2 style="text-align: center; margin-bottom: 1.5rem;">Join the AI Chat Community</h2>
+            
+            <div class="auth-forms">
+                <div class="card">
+                    <h3>Login</h3>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-username">Username</label>
+                            <input type="text" id="login-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3>Register</h3>
+                    <form id="register-form">
+                        <div class="form-group">
+                            <label for="register-username">Username</label>
+                            <input type="text" id="register-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email (optional)</label>
+                            <input type="email" id="register-email">
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Register</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="chat-page" class="page">
+            <h2 style="margin-bottom: 1.5rem;">AI Chat Room</h2>
+            
+            <div class="chat-container">
+                <div class="users-list">
+                    <h3>Online Users</h3>
+                    <div id="users-container">
+                        <!-- Users will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="chat-box">
+                    <div class="chat-header">
+                        Global Chat
+                    </div>
+                    
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Messages will be populated here -->
+                    </div>
+                    
+                    <div class="chat-input">
+                        <input type="text" id="message-input" placeholder="Type your message here...">
+                        <button class="btn btn-primary" id="send-button">Send</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>AI Chat Application &copy; 2023. Hosted on Vercel.</p>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const pages = document.querySelectorAll('.page');
+        const homePage = document.getElementById('home-page');
+        const authPage = document.getElementById('auth-page');
+        const chatPage = document.getElementById('chat-page');
+        
+        const homeLink = document.getElementById('home-link');
+        const chatLink = document.getElementById('chat-link');
+        const loginLink = document.getElementById('login-link');
+        const registerLink = document.getElementById('register-link');
+        const logoutLink = document.getElementById('logout-link');
+        
+        const getStartedBtn = document.getElementById('get-started-btn');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        
+        const usersContainer = document.getElementById('users-container');
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        
+        // App State
+        let currentUser = null;
+        let users = [];
+        let messages = [];
+        
+        // Show a specific page
+        function showPage(page) {
+            pages.forEach(p => p.classList.remove('active'));
+            page.classList.add('active');
+            
+            // Update navigation
+            if (page === chatPage && currentUser) {
+                loginLink.style.display = 'none';
+                registerLink.style.display = 'none';
+                logoutLink.style.display = 'block';
+                loadChatData();
+            } else {
+                loginLink.style.display = 'block';
+                registerLink.style.display = 'block';
+                logoutLink.style.display = 'none';
+            }
+        }
+        
+        // Navigation event listeners
+        homeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage(homePage);
+        });
+        
+        chatLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentUser) {
+                showPage(chatPage);
+            } else {
+                showPage(authPage);
+            }
+        });
+        
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage(authPage);
+        });
+        
+        registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage(authPage);
+        });
+        
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentUser = null;
+            showPage(homePage);
+        });
+        
+        getStartedBtn.addEventListener('click', () => {
+            showPage(authPage);
+        });
+        
+        // Auth form submissions
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Simulate login process
+            simulateLogin(username, password);
+        });
+        
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const email = document.getElementById('register-email').value;
+            
+            // Simulate registration process
+            simulateRegister(username, password, email);
+        });
+        
+        // Chat functionality
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText && currentUser) {
+                // Add message to UI
+                addMessageToUI({
+                    id: Date.now(),
+                    text: messageText,
+                    sender: currentUser.username,
+                    timestamp: new Date().toLocaleTimeString(),
+                    type: 'outgoing'
+                });
+                
+                // Clear input
+                messageInput.value = '';
+                
+                // Simulate AI response after a delay
+                setTimeout(() => {
+                    simulateAIResponse(messageText);
+                }, 1000 + Math.random() * 2000);
+            }
+        }
+        
+        function addMessageToUI(message) {
+            const messageEl = document.createElement('div');
+            messageEl.classList.add('message', message.type);
+            
+            messageEl.innerHTML = `
+                <div class="message-sender">${message.sender}</div>
+                <div class="message-text">${message.text}</div>
+                <div class="message-time">${message.timestamp}</div>
+            `;
+            
+            chatMessages.appendChild(messageEl);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function addUserToUI(user) {
+            const userEl = document.createElement('div');
+            userEl.classList.add('user-item');
+            userEl.dataset.userId = user.id;
+            
+            userEl.innerHTML = `
+                <div class="user-avatar">${user.username.charAt(0).toUpperCase()}</div>
+                <div class="user-name">${user.username}</div>
+                <div class="online-indicator"></div>
+            `;
+            
+            usersContainer.appendChild(userEl);
+        }
+        
+        // Simulated backend functions
+        function simulateLogin(username, password) {
+            // In a real app, this would be an API call to your backend
+            currentUser = {
+                id: Date.now(),
+                username: username,
+                email: ''
+            };
+            
+            showPage(chatPage);
+            
+            // Show success message
+            addMessageToUI({
+                id: Date.now(),
+                text: `Welcome to the chat, ${username}! I'm your AI assistant. How can I help you today?`,
+                sender: 'AI Assistant',
+                timestamp: new Date().toLocaleTimeString(),
+                type: 'incoming'
+            });
+        }
+        
+        function simulateRegister(username, password, email) {
+            // In a real app, this would be an API call to your backend
+            currentUser = {
+                id: Date.now(),
+                username: username,
+                email: email
+            };
+            
+            showPage(chatPage);
+            
+            // Show success message
+            addMessageToUI({
+                id: Date.now(),
+                text: `Welcome to the chat, ${username}! I'm your AI assistant. How can I help you today?`,
+                sender: 'AI Assistant',
+                timestamp: new Date().toLocaleTimeString(),
+                type: 'incoming'
+            });
+        }
+        
+        function simulateAIResponse(userMessage) {
+            const responses = [
+                "That's interesting! Tell me more about that.",
+                "I understand. How does that make you feel?",
+                "I'm here to help. What else would you like to know?",
+                "That's a great point! Have you considered other perspectives?",
+                "I'm learning from our conversation. Please continue.",
+                "Fascinating! I can connect you with others who share your interests.",
+                "I appreciate you sharing that with me. What would you like to do next?",
+                "I'm processing that information. In the meantime, would you like to hear a fun fact?",
+                "Based on what you've told me, I think you might enjoy our community features.",
+                "I've noted your preference. How can I assist you further?"
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            addMessageToUI({
+                id: Date.now(),
+                text: randomResponse,
+                sender: 'AI Assistant',
+                timestamp: new Date().toLocaleTimeString(),
+                type: 'incoming'
+            });
+        }
+        
+        function loadChatData() {
+            // Simulate loading users
+            users = [
+                { id: 1, username: 'AI_Assistant' },
+                { id: 2, username: 'JohnDoe' },
+                { id: 3, username: 'JaneSmith' },
+                { id: 4, username: 'TechGuru' }
+            ];
+            
+            // Clear users container
+            usersContainer.innerHTML = '';
+            
+            // Add users to UI
+            users.forEach(user => addUserToUI(user));
+            
+            // Add welcome message if no messages exist
+            if (chatMessages.children.length === 0) {
+                addMessageToUI({
+                    id: Date.now(),
+                    text: "Welcome to the AI Chat! Start a conversation and I'll respond.",
+                    sender: 'AI Assistant',
+                    timestamp: new Date().toLocaleTimeString(),
+                    type: 'incoming'
+                });
+            }
+        }
+        
+        // Initialize the app
+        showPage(homePage);
+    </script>
+</body>
+</html>
