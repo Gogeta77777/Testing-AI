@@ -1,0 +1,12 @@
+{
+  "name": "ai-chat-app",
+  "version": "1.0.0",
+  "description": "AI-powered multiplayer chat application",
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "build": "echo 'No build step required for static site'"
+  },
+  "keywords": ["ai", "chat", "multiplayer", "vercel"],
+  "author": "Your Name",
+  "license": "MIT"
+}
